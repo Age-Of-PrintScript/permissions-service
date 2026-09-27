@@ -1,0 +1,20 @@
+#!/bin/sh
+set -e
+
+cd "$(git rev-parse --show-toplevel)"
+
+
+echo "Running pre-commit checks..."
+
+echo "Formatting code..."
+./gradlew ktlintFormat detekt --auto-correct
+
+git update-index --again
+
+echo "Checking linters..."
+./gradlew ktlintCheck detekt
+
+echo "Running tests..."
+./gradlew test
+
+echo "✅ All checks passed! Proceeding with commit."
