@@ -1,4 +1,4 @@
-package age.of.printscript.application
+package age.of.printscript.demo
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration

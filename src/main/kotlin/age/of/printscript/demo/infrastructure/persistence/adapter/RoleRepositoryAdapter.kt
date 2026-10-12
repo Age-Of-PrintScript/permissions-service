@@ -1,0 +1,14 @@
+package age.of.printscript.demo.infrastructure.persistence.adapter
+
+import age.of.printscript.demo.domain.Role
+import age.of.printscript.demo.domain.port.RoleRepository
+import age.of.printscript.demo.infrastructure.persistence.mapper.toDomain
+import age.of.printscript.demo.infrastructure.persistence.repository.JpaRoleRepository
+import org.springframework.stereotype.Repository
+
+@Repository
+class RoleRepositoryAdapter(
+    private val jpa: JpaRoleRepository,
+) : RoleRepository {
+    override fun findById(id: Long): Role? = jpa.findById(id).orElse(null)?.toDomain()
+}
