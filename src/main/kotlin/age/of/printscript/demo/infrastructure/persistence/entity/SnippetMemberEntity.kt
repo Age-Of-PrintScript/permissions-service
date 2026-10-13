@@ -18,7 +18,8 @@ import jakarta.persistence.UniqueConstraint
     indexes = [Index(columnList = "user_id, snippet_id")],
 )
 class SnippetMemberEntity(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
     @Column(name = "user_id", nullable = false)
     val userId: String,
