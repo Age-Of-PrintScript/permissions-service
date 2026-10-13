@@ -11,7 +11,7 @@ class PermissionController(
     private val getUserPermissions: GetUserPermissionsUseCase,
 ) {
     @GetMapping("/permissions")
-    fun getUserPermissions(
+    fun list(
         @RequestParam userId: String,
         @RequestParam snippetId: Long,
     ): List<PermissionResponse> = getUserPermissions.invoke(userId, snippetId).map { PermissionResponse(it.id, it.name) }
