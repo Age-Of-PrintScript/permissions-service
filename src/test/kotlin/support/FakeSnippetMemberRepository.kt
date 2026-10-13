@@ -1,4 +1,4 @@
-package age.of.printscript.demo.support
+package support
 
 import age.of.printscript.demo.domain.Permission
 import age.of.printscript.demo.domain.Role

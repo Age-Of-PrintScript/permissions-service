@@ -6,7 +6,7 @@ import age.of.printscript.demo.domain.Role
 import age.of.printscript.demo.domain.SnippetMember
 import age.of.printscript.demo.infrastructure.controller.PermissionController
 import age.of.printscript.demo.infrastructure.controller.dto.PermissionResponse
-import age.of.printscript.demo.support.FakeSnippetMemberRepository
+import support.FakeSnippetMemberRepository
 import kotlin.collections.emptyList
 import kotlin.test.Test
 import kotlin.test.assertEquals
