@@ -1,5 +1,6 @@
 package age.of.printscript.demo.domain.port
 
+import age.of.printscript.demo.domain.Permission
 import age.of.printscript.demo.domain.SnippetMember
 
 interface SnippetMemberRepository {
@@ -12,6 +13,11 @@ interface SnippetMemberRepository {
         snippetId: Long,
         roleId: Long,
     ): Boolean
+
+    fun findPermissions(
+        userId: String,
+        snippetId: Long,
+    ): List<Permission>
 
     fun hasPermission(
         userId: String,

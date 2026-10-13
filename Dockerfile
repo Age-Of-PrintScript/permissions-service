@@ -1,22 +1,23 @@
-FROM ubuntu:latest
+# ---------- Etapa 1: compilar ----------
+FROM eclipse-temurin:21-jdk AS builder
 
-# El comando copy copia archivos desde el host y los copia dentro de la imagen.
-# Necesita dos partes: COPY [que archivo dentro de tu computadora] [que directorio dentro de la imagen]
-# Si lo copio a ".", lo estoy copiando a el root de la imagen
+WORKDIR /app
 
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle.kts settings.gradle.kts ./
 COPY src src
 
-# Primero le inyecto las variables de entorio desde afuera sin que queden guardadas en las capas de ejecucion de docker
-# Luego las cacheo
-# Despues, corro los tests. el bootjar es la manera de correr todas las depenencias de sprinboot con gradle
+RUN chmod +x gradlew
 
-RUN --mount=typesecret, id=gradle_properties, target=/root/.gradle/gradle.properties \
-    --mount=type=cache, target=/root/.gradle/caches \
-    ./gradlew bootjar -no--daemon -x test
+# El secret inyecta gradle.properties sin dejarlo guardado en las capas de la imagen.
+# El cache conserva las dependencias descargadas entre builds.
+# bootJar genera el jar ejecutable con todas las dependencias; -x test omite los tests.
+RUN --mount=type=secret,id=gradle_properties,target=/root/.gradle/gradle.properties \
+    --mount=type=cache,target=/root/.gradle/caches \
+    ./gradlew bootJar --no-daemon -x test
 
+# ---------- Etapa 2: ejecutar ----------
 FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
@@ -27,4 +28,4 @@ EXPOSE 8080
 
 LABEL authors="ignaciogarcia"
 
-ENTRYPOINT ["top", "-b"]
+ENTRYPOINT ["java", "-jar", "app.jar"]

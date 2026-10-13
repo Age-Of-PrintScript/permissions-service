@@ -1,5 +1,6 @@
 package age.of.printscript.demo.infrastructure.persistence.repository
 
+import age.of.printscript.demo.infrastructure.persistence.entity.PermissionEntity
 import age.of.printscript.demo.infrastructure.persistence.entity.SnippetMemberEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -30,4 +31,19 @@ interface JpaSnippetMemberRepository : JpaRepository<SnippetMemberEntity, Long> 
         @Param("snippetId") snippetId: Long,
         @Param("permission") permission: String,
     ): Boolean
+
+    @Query(
+        """
+        select distinct p
+        from SnippetMemberEntity m
+        join m.role r
+        join r.permissions p
+        where m.userId = :userId
+          and m.snippetId = :snippetId
+        """,
+    )
+    fun findPermissions(
+        @Param("userId") userId: String,
+        @Param("snippetID") snippetId: Long,
+    ): List<PermissionEntity>
 }
