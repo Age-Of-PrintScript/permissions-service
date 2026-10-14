@@ -21,37 +21,37 @@ class SnippetMemberRepositoryAdapterTest {
     private val roleJpa = mock(JpaRoleRepository::class.java)
     private val adapter = SnippetMemberRepositoryAdapter(jpa, roleJpa)
 
-    private val roleEntity = UserSnippetRoleEntity(id = 1, name = "OWNER")
-    private val memberEntity = SnippetMemberEntity(id = 7, userId = "ana", snippetId = 10, role = roleEntity)
+    private val roleEntity = UserSnippetRoleEntity(id = "1", name = "OWNER")
+    private val memberEntity = SnippetMemberEntity(id = "7", userId = "ana", snippetId = "10", role = roleEntity)
 
     @Test
     fun `findBySnippetId maps entities to domain`() {
-        `when`(jpa.findBySnippetId(10)).thenReturn(listOf(memberEntity))
-        val result = adapter.findBySnippetId(10)
-        assertEquals(listOf(SnippetMember(7, "ana", 10, Role(1, "OWNER"))), result)
+        `when`(jpa.findBySnippetId("10")).thenReturn(listOf(memberEntity))
+        val result = adapter.findBySnippetId("10")
+        assertEquals(listOf(SnippetMember("7", "ana", "10", Role("1", "OWNER"))), result)
     }
 
     @Test
     fun `hasPermission and existsMemberWithRole delegate to jpa`() {
-        `when`(jpa.hasPermission("ana", 10, "READ")).thenReturn(true)
-        `when`(jpa.existsByUserIdAndSnippetIdAndRoleId("ana", 10, 1)).thenReturn(true)
-        assertTrue(adapter.hasPermission("ana", 10, "READ"))
-        assertTrue(adapter.existsMemberWithRole("ana", 10, 1))
+        `when`(jpa.hasPermission("ana", "10", "READ")).thenReturn(true)
+        `when`(jpa.existsByUserIdAndSnippetIdAndRoleId("ana", "10", "1")).thenReturn(true)
+        assertTrue(adapter.hasPermission("ana", "10", "READ"))
+        assertTrue(adapter.existsMemberWithRole("ana", "10", "1"))
     }
 
     @Test
     fun `findPermissions maps permission entities`() {
-        `when`(jpa.findPermissions("ana", 10)).thenReturn(listOf(PermissionEntity(id = 1, name = "READ")))
-        assertEquals("READ", adapter.findPermissions("ana", 10).single().name)
+        `when`(jpa.findPermissions("ana", "10")).thenReturn(listOf(PermissionEntity(id = "1", name = "READ")))
+        assertEquals("READ", adapter.findPermissions("ana", "10").single().name)
     }
 
     @Test
     fun `save loads the role and returns the saved member`() {
-        `when`(roleJpa.findById(1L)).thenReturn(Optional.of(roleEntity))
+        `when`(roleJpa.findById("1")).thenReturn(Optional.of(roleEntity))
         `when`(jpa.save(Mockito.any(SnippetMemberEntity::class.java))).thenReturn(memberEntity)
 
-        val saved = adapter.save(SnippetMember(userId = "ana", snippetId = 10, role = Role(1, "OWNER")))
+        val saved = adapter.save(SnippetMember(userId = "ana", snippetId = "10", role = Role("1", "OWNER")))
 
-        assertEquals(7L, saved.id)
+        assertEquals("7", saved.id)
     }
 }

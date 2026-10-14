@@ -12,34 +12,34 @@ import kotlin.test.assertFailsWith
 class MappersTest {
     @Test
     fun `maps a permission entity to the domain permission`() {
-        val entity = PermissionEntity(id = 1L, name = "snippet:read")
+        val entity = PermissionEntity(id = "1", name = "snippet:read")
 
-        assertEquals(Permission(id = 1L, name = "snippet:read"), entity.toDomain())
+        assertEquals(Permission(id = "1", name = "snippet:read"), entity.toDomain())
     }
 
     @Test
     fun `maps a role entity to the domain role`() {
-        val entity = UserSnippetRoleEntity(id = 2L, name = "EDITOR")
+        val entity = UserSnippetRoleEntity(id = "2", name = "EDITOR")
 
-        assertEquals(Role(id = 2L, name = "EDITOR"), entity.toDomain())
+        assertEquals(Role(id = "2", name = "EDITOR"), entity.toDomain())
     }
 
     @Test
     fun `maps a snippet member including its nested role`() {
         val entity =
             SnippetMemberEntity(
-                id = 10L,
+                id = "10",
                 userId = "123",
-                snippetId = 124L,
-                role = UserSnippetRoleEntity(id = 2L, name = "EDITOR"),
+                snippetId = "124",
+                role = UserSnippetRoleEntity(id = "2", name = "EDITOR"),
             )
 
         val expected =
             SnippetMember(
-                id = 10L,
+                id = "10",
                 userId = "123",
-                snippetId = 124L,
-                role = Role(id = 2L, name = "EDITOR"),
+                snippetId = "124",
+                role = Role(id = "2", name = "EDITOR"),
             )
 
         assertEquals(expected, entity.toDomain())
@@ -58,8 +58,8 @@ class MappersTest {
             SnippetMemberEntity(
                 id = null,
                 userId = "123",
-                snippetId = 124L,
-                role = UserSnippetRoleEntity(id = 2L, name = "EDITOR"),
+                snippetId = "124",
+                role = UserSnippetRoleEntity(id = "2", name = "EDITOR"),
             )
 
         assertFailsWith<NullPointerException> { entity.toDomain() }

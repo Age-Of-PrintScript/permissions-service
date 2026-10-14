@@ -14,22 +14,22 @@ import kotlin.test.assertEquals
 class PermissionControllerTest {
     @Test
     fun `list maps domain permissions to responses`() {
-        val role = Role(1, "OWNER")
+        val role = Role("1", "OWNER")
         val repo =
             FakeSnippetMemberRepository().apply {
-                givenRolePermissions(role, listOf(Permission(1, "READ"), Permission(2, "WRITE")))
-                save(SnippetMember(userId = "ana", snippetId = 10, role = role))
+                givenRolePermissions(role, listOf(Permission("1", "READ"), Permission("2", "WRITE")))
+                save(SnippetMember(userId = "ana", snippetId = "10", role = role))
             }
         val controller = PermissionController(GetUserPermissionsUseCase(repo))
 
-        val result = controller.list("ana", 10)
+        val result = controller.list("ana", "10")
 
-        assertEquals(listOf(PermissionResponse(1, "READ"), PermissionResponse(2, "WRITE")), result)
+        assertEquals(listOf(PermissionResponse("1", "READ"), PermissionResponse("2", "WRITE")), result)
     }
 
     @Test
     fun `list returns empty when there are no permissions`() {
         val controller = PermissionController(GetUserPermissionsUseCase(FakeSnippetMemberRepository()))
-        assertEquals(emptyList(), controller.list("x", 1))
+        assertEquals(emptyList(), controller.list("x", "1"))
     }
 }

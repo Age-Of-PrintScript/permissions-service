@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository
 class RoleRepositoryAdapter(
     private val jpa: JpaRoleRepository,
 ) : RoleRepository {
-    override fun findById(id: Long): Role? = jpa.findById(id).orElse(null)?.toDomain()
+    override fun findById(id: String): Role? = jpa.findById(id).orElse(null)?.toDomain()
 }

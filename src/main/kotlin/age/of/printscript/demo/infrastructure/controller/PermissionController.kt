@@ -13,6 +13,6 @@ class PermissionController(
     @GetMapping("/permissions")
     fun list(
         @RequestParam userId: String,
-        @RequestParam snippetId: Long,
+        @RequestParam snippetId: String,
     ): List<PermissionResponse> = getUserPermissions.invoke(userId, snippetId).map { PermissionResponse(it.id, it.name) }
 }

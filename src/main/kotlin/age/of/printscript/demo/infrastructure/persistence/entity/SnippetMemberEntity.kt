@@ -20,11 +20,11 @@ import jakarta.persistence.UniqueConstraint
 class SnippetMemberEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    val id: String? = null,
     @Column(name = "user_id", nullable = false)
     val userId: String,
     @Column(name = "snippet_id", nullable = false)
-    val snippetId: Long,
+    val snippetId: String,
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     val role: UserSnippetRoleEntity,

@@ -9,7 +9,7 @@ class CheckUserPermissionUseCase(
 ) {
     operator fun invoke(
         userId: String,
-        snippetId: Long,
+        snippetId: String,
         permission: String,
     ): Boolean = members.hasPermission(userId, snippetId, permission)
 }

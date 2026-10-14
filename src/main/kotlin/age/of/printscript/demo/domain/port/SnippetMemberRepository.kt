@@ -4,28 +4,28 @@ import age.of.printscript.demo.domain.Permission
 import age.of.printscript.demo.domain.SnippetMember
 
 interface SnippetMemberRepository {
-    fun findById(id: Long): SnippetMember?
+    fun findById(id: String): SnippetMember?
 
-    fun findBySnippetId(snippetId: Long): List<SnippetMember>
+    fun findBySnippetId(snippetId: String): List<SnippetMember>
 
     fun existsMemberWithRole(
         userId: String,
-        snippetId: Long,
-        roleId: Long,
+        snippetId: String,
+        roleId: String,
     ): Boolean
 
     fun findPermissions(
         userId: String,
-        snippetId: Long,
+        snippetId: String,
     ): List<Permission>
 
     fun hasPermission(
         userId: String,
-        snippetId: Long,
+        snippetId: String,
         permission: String,
     ): Boolean
 
     fun save(member: SnippetMember): SnippetMember
 
-    fun delete(id: Long)
+    fun delete(id: String)
 }

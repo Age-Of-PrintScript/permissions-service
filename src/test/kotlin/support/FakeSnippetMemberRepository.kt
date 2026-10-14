@@ -7,8 +7,8 @@ import age.of.printscript.demo.domain.port.SnippetMemberRepository
 
 class FakeSnippetMemberRepository : SnippetMemberRepository {
     private val members = mutableListOf<SnippetMember>()
-    private val rolePermissions = mutableMapOf<Long, List<Permission>>()
-    private var nextId = 1L
+    private val rolePermissions = mutableMapOf<String, List<Permission>>()
+    private var nextId = 0
 
     fun givenRolePermissions(
         role: Role,
@@ -17,19 +17,19 @@ class FakeSnippetMemberRepository : SnippetMemberRepository {
         rolePermissions[role.id] = permissions
     }
 
-    override fun findById(id: Long) = members.firstOrNull { it.id == id }
+    override fun findById(id: String) = members.firstOrNull { it.id == id }
 
-    override fun findBySnippetId(snippetId: Long) = members.filter { it.snippetId == snippetId }
+    override fun findBySnippetId(snippetId: String) = members.filter { it.snippetId == snippetId }
 
     override fun existsMemberWithRole(
         userId: String,
-        snippetId: Long,
-        roleId: Long,
+        snippetId: String,
+        roleId: String,
     ) = members.any { it.userId == userId && it.snippetId == snippetId && it.role.id == roleId }
 
     override fun findPermissions(
         userId: String,
-        snippetId: Long,
+        snippetId: String,
     ): List<Permission> =
         members
             .filter { it.userId == userId && it.snippetId == snippetId }
@@ -38,18 +38,18 @@ class FakeSnippetMemberRepository : SnippetMemberRepository {
 
     override fun hasPermission(
         userId: String,
-        snippetId: Long,
+        snippetId: String,
         permission: String,
-    ) = findPermissions(userId, snippetId).any { it.name == permission }
+    ) = findPermissions(userId, snippetId).any { it.name.equals(permission) }
 
     override fun save(member: SnippetMember): SnippetMember {
-        val saved = member.copy(id = member.id ?: nextId++)
+        val saved = member.copy(id = member.id ?: (nextId++).toString())
         members.removeAll { it.id == saved.id }
         members.add(saved)
         return saved
     }
 
-    override fun delete(id: Long) {
+    override fun delete(id: String) {
         members.removeAll { it.id == id }
     }
 }

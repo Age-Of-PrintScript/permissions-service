@@ -6,13 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 
-interface JpaSnippetMemberRepository : JpaRepository<SnippetMemberEntity, Long> {
-    fun findBySnippetId(snippetId: Long): List<SnippetMemberEntity>
+interface JpaSnippetMemberRepository : JpaRepository<SnippetMemberEntity, String> {
+    fun findBySnippetId(snippetId: String): List<SnippetMemberEntity>
 
     fun existsByUserIdAndSnippetIdAndRoleId(
         userId: String,
-        snippetId: Long,
-        roleId: Long,
+        snippetId: String,
+        roleId: String,
     ): Boolean
 
     @Query(
@@ -28,7 +28,7 @@ interface JpaSnippetMemberRepository : JpaRepository<SnippetMemberEntity, Long> 
     )
     fun hasPermission(
         @Param("userId") userId: String,
-        @Param("snippetId") snippetId: Long,
+        @Param("snippetId") snippetId: String,
         @Param("permission") permission: String,
     ): Boolean
 
@@ -44,6 +44,6 @@ interface JpaSnippetMemberRepository : JpaRepository<SnippetMemberEntity, Long> 
     )
     fun findPermissions(
         @Param("userId") userId: String,
-        @Param("snippetID") snippetId: Long,
+        @Param("snippetId") snippetId: String,
     ): List<PermissionEntity>
 }

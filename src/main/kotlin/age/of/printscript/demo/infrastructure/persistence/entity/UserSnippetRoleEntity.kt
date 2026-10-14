@@ -15,7 +15,7 @@ import jakarta.persistence.Table
 @Table(name = "roles")
 class UserSnippetRoleEntity(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null,
+    val id: String? = null,
     @Column(nullable = false, unique = true)
     val name: String,
     @ManyToMany(fetch = FetchType.LAZY)

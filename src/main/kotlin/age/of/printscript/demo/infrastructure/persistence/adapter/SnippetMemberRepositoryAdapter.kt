@@ -14,25 +14,25 @@ class SnippetMemberRepositoryAdapter(
     private val jpa: JpaSnippetMemberRepository,
     private val roleJpa: JpaRoleRepository,
 ) : SnippetMemberRepository {
-    override fun findById(id: Long): SnippetMember? = jpa.findById(id).orElse(null)?.toDomain()
+    override fun findById(id: String): SnippetMember? = jpa.findById(id).orElse(null)?.toDomain()
 
-    override fun findBySnippetId(snippetId: Long): List<SnippetMember> = jpa.findBySnippetId(snippetId).map { it.toDomain() }
+    override fun findBySnippetId(snippetId: String): List<SnippetMember> = jpa.findBySnippetId(snippetId).map { it.toDomain() }
 
     override fun existsMemberWithRole(
         userId: String,
-        snippetId: Long,
-        roleId: Long,
+        snippetId: String,
+        roleId: String,
     ): Boolean = jpa.existsByUserIdAndSnippetIdAndRoleId(userId, snippetId, roleId)
 
     override fun hasPermission(
         userId: String,
-        snippetId: Long,
+        snippetId: String,
         permission: String,
     ): Boolean = jpa.hasPermission(userId, snippetId, permission)
 
     override fun findPermissions(
         userId: String,
-        snippetId: Long,
+        snippetId: String,
     ): List<Permission> = jpa.findPermissions(userId, snippetId).map { it.toDomain() }
 
     override fun save(member: SnippetMember): SnippetMember {
@@ -48,5 +48,5 @@ class SnippetMemberRepositoryAdapter(
             ).toDomain()
     }
 
-    override fun delete(id: Long) = jpa.deleteById(id)
+    override fun delete(id: String) = jpa.deleteById(id)
 }

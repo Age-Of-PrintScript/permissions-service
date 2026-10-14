@@ -10,6 +10,6 @@ class GetUserPermissionsUseCase(
 ) {
     operator fun invoke(
         userId: String,
-        snippetId: Long,
+        snippetId: String,
     ): List<Permission> = members.findPermissions(userId, snippetId)
 }
