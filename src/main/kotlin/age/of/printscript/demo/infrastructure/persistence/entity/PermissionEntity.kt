@@ -11,7 +11,7 @@ import jakarta.persistence.Table
 @Table(name = "permissions")
 class PermissionEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     val id: String? = null,
     @Column(nullable = false, unique = true)
     val name: String,

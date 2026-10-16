@@ -14,7 +14,7 @@ import jakarta.persistence.Table
 @Entity
 @Table(name = "roles")
 class UserSnippetRoleEntity(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.UUID)
     val id: String? = null,
     @Column(nullable = false, unique = true)
     val name: String,

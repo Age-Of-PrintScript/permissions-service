@@ -12,5 +12,5 @@ WHERE (r.name = 'OWNER')
     ON CONFLICT DO NOTHING;
 
 INSERT INTO user_snippet_roles (user_id, snippet_id, role_id)
-SELECT '123', 124, id FROM roles WHERE name = 'EDITOR'
+SELECT '123', '124', id FROM roles WHERE name = 'EDITOR'
     ON CONFLICT DO NOTHING;

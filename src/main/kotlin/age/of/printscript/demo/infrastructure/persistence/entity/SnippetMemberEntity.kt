@@ -19,7 +19,7 @@ import jakarta.persistence.UniqueConstraint
 )
 class SnippetMemberEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     val id: String? = null,
     @Column(name = "user_id", nullable = false)
     val userId: String,
