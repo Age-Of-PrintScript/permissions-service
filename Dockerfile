@@ -13,7 +13,6 @@ RUN chmod +x gradlew
 # El secret inyecta gradle.properties sin dejarlo guardado en las capas de la imagen.
 # El cache conserva las dependencias descargadas entre builds.
 # bootJar genera el jar ejecutable con todas las dependencias; -x test omite los tests.
-ENV JAVA_TOOL_OPTIONS="-Djava.net.preferIPv4Stack=true"
 
 RUN --mount=type=secret,id=gradle_properties,target=/root/.gradle/gradle.properties \
     --mount=type=cache,target=/root/.gradle/caches \
@@ -26,8 +25,6 @@ WORKDIR /app
 
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-EXPOSE 8080
-
-LABEL authors="ignaciogarcia"
+EXPOSE 8081
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -41,6 +41,7 @@ class SnippetMemberRepositoryAdapter(
         return jpa
             .save(
                 SnippetMemberEntity(
+                    id = member.id,
                     userId = member.userId,
                     snippetId = member.snippetId,
                     role = roleEntity,
