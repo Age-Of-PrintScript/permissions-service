@@ -2,11 +2,15 @@ package age.of.printscript.demo.infrastructure.persistence.adapter
 
 import age.of.printscript.demo.domain.Permission
 import age.of.printscript.demo.domain.SnippetMember
+import age.of.printscript.demo.domain.port.AddMemberOutcome
+import age.of.printscript.demo.domain.port.RemoveMemberOutcome
 import age.of.printscript.demo.domain.port.SnippetMemberRepository
+import age.of.printscript.demo.domain.port.UpdateMemberRoleOutcome
 import age.of.printscript.demo.infrastructure.persistence.entity.SnippetMemberEntity
 import age.of.printscript.demo.infrastructure.persistence.mapper.toDomain
 import age.of.printscript.demo.infrastructure.persistence.repository.JpaRoleRepository
 import age.of.printscript.demo.infrastructure.persistence.repository.JpaSnippetMemberRepository
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -18,11 +22,16 @@ class SnippetMemberRepositoryAdapter(
 
     override fun findBySnippetId(snippetId: String): List<SnippetMember> = jpa.findBySnippetId(snippetId).map { it.toDomain() }
 
-    override fun existsMemberWithRole(
+    @Transactional
+    override fun updateRole(
         userId: String,
         snippetId: String,
         roleId: String,
-    ): Boolean = jpa.existsByUserIdAndSnippetIdAndRoleId(userId, snippetId, roleId)
+    ): UpdateMemberRoleOutcome {
+        val role = roleJpa.getReferenceById(roleId)
+        val updatedRows = jpa.updateUserRole(userId, snippetId, role)
+        return if (updatedRows > 0) UpdateMemberRoleOutcome.Updated else UpdateMemberRoleOutcome.MemberNotFound
+    }
 
     override fun hasPermission(
         userId: String,
@@ -35,19 +44,26 @@ class SnippetMemberRepositoryAdapter(
         snippetId: String,
     ): List<Permission> = jpa.findPermissions(userId, snippetId).map { it.toDomain() }
 
-    override fun save(member: SnippetMember): SnippetMember {
-        val roleEntity = roleJpa.findById(member.role.id).orElseThrow()
+    @Transactional
+    override fun add(
+        userId: String,
+        snippetId: String,
+        roleId: String,
+    ): AddMemberOutcome {
+        if (jpa.existsByUserIdAndSnippetId(userId, snippetId)) return AddMemberOutcome.AlreadyMember
 
-        return jpa
-            .save(
-                SnippetMemberEntity(
-                    id = member.id,
-                    userId = member.userId,
-                    snippetId = member.snippetId,
-                    role = roleEntity,
-                ),
-            ).toDomain()
+        jpa.save(SnippetMemberEntity(userId = userId, snippetId = snippetId, role = roleJpa.getReferenceById(roleId)))
+        return AddMemberOutcome.Added
     }
 
-    override fun delete(id: String) = jpa.deleteById(id)
+    @Transactional
+    override fun delete(
+        userId: String,
+        snippetId: String,
+    ): RemoveMemberOutcome =
+        if (jpa.deleteByUserIdAndSnippetId(userId, snippetId) > 0) {
+            RemoveMemberOutcome.Removed
+        } else {
+            RemoveMemberOutcome.MemberNotFound
+        }
 }

@@ -13,7 +13,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "roles")
-class UserSnippetRoleEntity(
+class RoleEntity(
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     val id: String? = null,
     @Column(nullable = false, unique = true)

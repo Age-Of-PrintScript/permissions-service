@@ -14,7 +14,7 @@ import jakarta.persistence.UniqueConstraint
 @Entity
 @Table(
     name = "user_snippet_roles",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "snippet_id", "role_id"])],
+    uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "snippet_id"])],
     indexes = [Index(columnList = "user_id, snippet_id")],
 )
 class SnippetMemberEntity(
@@ -27,5 +27,5 @@ class SnippetMemberEntity(
     val snippetId: String,
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
-    val role: UserSnippetRoleEntity,
+    val role: RoleEntity,
 )

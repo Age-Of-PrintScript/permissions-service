@@ -7,7 +7,7 @@ data class Permission(
     val name: String,
 )
 
-data class Role(
+data class SnippetRole(
     val id: String,
     val name: String,
 )
@@ -16,5 +16,5 @@ data class SnippetMember(
     val id: String? = null,
     val userId: String,
     val snippetId: String,
-    val role: Role,
+    val snippetRole: SnippetRole,
 )
