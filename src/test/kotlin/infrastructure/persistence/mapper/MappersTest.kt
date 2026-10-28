@@ -1,9 +1,9 @@
 import age.of.printscript.demo.domain.Permission
-import age.of.printscript.demo.domain.Role
 import age.of.printscript.demo.domain.SnippetMember
+import age.of.printscript.demo.domain.SnippetRole
 import age.of.printscript.demo.infrastructure.persistence.entity.PermissionEntity
+import age.of.printscript.demo.infrastructure.persistence.entity.RoleEntity
 import age.of.printscript.demo.infrastructure.persistence.entity.SnippetMemberEntity
-import age.of.printscript.demo.infrastructure.persistence.entity.UserSnippetRoleEntity
 import age.of.printscript.demo.infrastructure.persistence.mapper.toDomain
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -19,9 +19,9 @@ class MappersTest {
 
     @Test
     fun `maps a role entity to the domain role`() {
-        val entity = UserSnippetRoleEntity(id = "2", name = "EDITOR")
+        val entity = RoleEntity(id = "2", name = "EDITOR")
 
-        assertEquals(Role(id = "2", name = "EDITOR"), entity.toDomain())
+        assertEquals(SnippetRole(id = "2", name = "EDITOR"), entity.toDomain())
     }
 
     @Test
@@ -31,7 +31,7 @@ class MappersTest {
                 id = "10",
                 userId = "123",
                 snippetId = "124",
-                role = UserSnippetRoleEntity(id = "2", name = "EDITOR"),
+                role = RoleEntity(id = "2", name = "EDITOR"),
             )
 
         val expected =
@@ -39,7 +39,7 @@ class MappersTest {
                 id = "10",
                 userId = "123",
                 snippetId = "124",
-                role = Role(id = "2", name = "EDITOR"),
+                snippetRole = SnippetRole(id = "2", name = "EDITOR"),
             )
 
         assertEquals(expected, entity.toDomain())
@@ -48,7 +48,7 @@ class MappersTest {
     @Test
     fun `fails when a role entity has no id`() {
         assertFailsWith<NullPointerException> {
-            UserSnippetRoleEntity(id = null, name = "EDITOR").toDomain()
+            RoleEntity(id = null, name = "EDITOR").toDomain()
         }
     }
 
@@ -59,7 +59,7 @@ class MappersTest {
                 id = null,
                 userId = "123",
                 snippetId = "124",
-                role = UserSnippetRoleEntity(id = "2", name = "EDITOR"),
+                role = RoleEntity(id = "2", name = "EDITOR"),
             )
 
         assertFailsWith<NullPointerException> { entity.toDomain() }
