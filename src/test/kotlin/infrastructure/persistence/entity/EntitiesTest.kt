@@ -5,6 +5,7 @@ import age.of.printscript.demo.infrastructure.persistence.entity.RoleEntity
 import age.of.printscript.demo.infrastructure.persistence.entity.SnippetMemberEntity
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class EntitiesTest {
@@ -17,5 +18,19 @@ class EntitiesTest {
         assertEquals("READ", perm.name)
         assertTrue(role.permissions.contains(perm))
         assertEquals("OWNER", member.role.name)
+    }
+
+    @Test
+    fun `entities default values`() {
+        val perm = PermissionEntity(name = "WRITE")
+        val role = RoleEntity(name = "VIEWER")
+        val member = SnippetMemberEntity(userId = "bob", snippetId = "20", role = role)
+
+        assertNull(perm.id)
+        assertNull(role.id)
+        assertTrue(role.permissions.isEmpty())
+        assertNull(member.id)
+        assertEquals("bob", member.userId)
+        assertEquals("20", member.snippetId)
     }
 }

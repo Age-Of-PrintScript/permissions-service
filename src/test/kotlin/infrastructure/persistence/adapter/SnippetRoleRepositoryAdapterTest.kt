@@ -9,7 +9,9 @@ import org.mockito.Mockito.`when`
 import java.util.Optional
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class SnippetRoleRepositoryAdapterTest {
     private val jpa = mock(JpaRoleRepository::class.java)
@@ -27,5 +29,19 @@ class SnippetRoleRepositoryAdapterTest {
         `when`(jpa.findById("4")).thenReturn(Optional.empty())
 
         assertNull(adapter.findById("4"))
+    }
+
+    @Test
+    fun `existsById returns true when role exists`() {
+        `when`(jpa.existsById("1")).thenReturn(true)
+
+        assertTrue(adapter.existsById("1"))
+    }
+
+    @Test
+    fun `existsById returns false when role does not exist`() {
+        `when`(jpa.existsById("99")).thenReturn(false)
+
+        assertFalse(adapter.existsById("99"))
     }
 }
