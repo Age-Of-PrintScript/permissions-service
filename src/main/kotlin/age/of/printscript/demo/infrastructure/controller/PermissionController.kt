@@ -1,6 +1,6 @@
 package age.of.printscript.demo.infrastructure.controller
 
-import age.of.printscript.demo.application.GetUserPermissionsUseCase
+import age.of.printscript.demo.application.query.GetUserPermissionsUseCase
 import age.of.printscript.demo.infrastructure.controller.dto.PermissionResponse
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -14,5 +14,5 @@ class PermissionController(
     fun list(
         @RequestParam userId: String,
         @RequestParam snippetId: String,
-    ): List<PermissionResponse> = getUserPermissions.invoke(userId, snippetId).map { PermissionResponse(it.id, it.name) }
+    ): List<PermissionResponse> = getUserPermissions(userId, snippetId).map { PermissionResponse(it.id, it.name) }
 }

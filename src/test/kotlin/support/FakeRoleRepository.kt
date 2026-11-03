@@ -1,14 +1,12 @@
 package support
 
-import age.of.printscript.demo.domain.Role
+import age.of.printscript.demo.domain.SnippetRole
 import age.of.printscript.demo.domain.port.RoleRepository
 
-class FakeRoleRepository : RoleRepository {
-    private val roles = mutableMapOf<String, Role>()
+class FakeRoleRepository(
+    private val roleIds: Set<String>,
+) : RoleRepository {
+    override fun findById(id: String): SnippetRole? = if (id in roleIds) SnippetRole(id = id, name = id) else null
 
-    fun givenRole(role: Role) {
-        roles[role.id] = role
-    }
-
-    override fun findById(id: String): Role? = roles[id]
+    override fun existsById(roleId: String): Boolean = roleId in roleIds
 }

@@ -1,4 +1,4 @@
-package age.of.printscript.demo.application
+package age.of.printscript.demo.application.query
 
 import age.of.printscript.demo.domain.port.SnippetMemberRepository
 import org.springframework.stereotype.Service
