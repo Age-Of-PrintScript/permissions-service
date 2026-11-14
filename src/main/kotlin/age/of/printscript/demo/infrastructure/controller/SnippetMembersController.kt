@@ -11,18 +11,15 @@ import age.of.printscript.demo.infrastructure.controller.dto.ShareSnippetRequest
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-
-// TODO: reemplazar el header X-User-Id por @AuthenticationPrincipal jwt: Jwt (jwt.subject)
-// cuando veamos autenticación.
-private const val REQUESTER_HEADER = "X-User-Id"
 
 @RestController
 @RequestMapping("/snippets/{snippetId}/members")
@@ -33,9 +30,9 @@ class SnippetMembersController(
     fun share(
         @PathVariable snippetId: String,
         @Valid @RequestBody body: ShareSnippetRequest,
-        @RequestHeader(REQUESTER_HEADER) requesterId: String,
+        @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<Any> =
-        when (manageMembers.share(requesterId, body.userId, snippetId, body.roleId)) {
+        when (manageMembers.share(jwt.subject!!, body.userId, snippetId, body.roleId)) {
             ShareResult.Success ->
                 ResponseEntity
                     .status(HttpStatus.CREATED)
@@ -53,9 +50,9 @@ class SnippetMembersController(
         @PathVariable snippetId: String,
         @PathVariable targetUserId: String,
         @Valid @RequestBody body: ChangeRoleRequest,
-        @RequestHeader(REQUESTER_HEADER) requesterId: String,
+        @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<Any> =
-        when (manageMembers.changeRole(requesterId, targetUserId, snippetId, body.roleId)) {
+        when (manageMembers.changeRole(jwt.subject!!, targetUserId, snippetId, body.roleId)) {
             ChangeRoleResult.Success ->
                 ResponseEntity.ok(MemberResponse(snippetId, targetUserId, body.roleId))
 
@@ -72,9 +69,9 @@ class SnippetMembersController(
     fun revoke(
         @PathVariable snippetId: String,
         @PathVariable targetUserId: String,
-        @RequestHeader(REQUESTER_HEADER) requesterId: String,
+        @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<Any> =
-        when (manageMembers.revoke(requesterId, targetUserId, snippetId)) {
+        when (manageMembers.revoke(jwt.subject!!, targetUserId, snippetId)) {
             RevokeResult.Success -> ResponseEntity.noContent().build()
 
             RevokeResult.NotAllowed -> error(HttpStatus.FORBIDDEN, "not_allowed")
