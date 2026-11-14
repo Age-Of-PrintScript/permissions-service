@@ -1,10 +1,12 @@
+# Token de Auth0 del usuario que hace el request (ver auth0-integration/setup/README.md)
+@token = <access_token>
 @owner = b73d8cc1-aac6-4d6b-8ab4-c20ec5afe72b
 @editor = a1c965b0-8786-4476-b8e5-7148df276583
 @viewer = 9a4c1f69-d04a-47a4-8fdd-4017da523dee
 
 ### Compartir: 123 (owner) le da acceso viewer a 456
 POST http://localhost:8080/snippets/124/members
-X-User-Id: 123
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -14,7 +16,7 @@ Content-Type: application/json
 
 ### Cambiar rol de 456 a editor
 PUT http://localhost:8080/snippets/124/members/456
-X-User-Id: 123
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
@@ -23,4 +25,4 @@ Content-Type: application/json
 
 ### Revocar a 456
 DELETE http://localhost:8080/snippets/124/members/456
-X-User-Id: 123
+Authorization: Bearer {{token}}
