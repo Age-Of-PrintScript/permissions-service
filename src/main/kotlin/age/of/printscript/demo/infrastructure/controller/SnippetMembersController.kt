@@ -32,11 +32,11 @@ class SnippetMembersController(
         @Valid @RequestBody body: ShareSnippetRequest,
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<Any> =
-        when (manageMembers.share(jwt.subject!!, body.userId, snippetId, body.roleId)) {
+        when (manageMembers.share(jwt.subject!!, body.userId, snippetId, body.role)) {
             ShareResult.Success ->
                 ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(MemberResponse(snippetId, body.userId, body.roleId))
+                    .body(MemberResponse(snippetId, body.userId, body.role.trim().uppercase()))
 
             ShareResult.NotAllowed -> error(HttpStatus.FORBIDDEN, "not_allowed")
 
@@ -54,9 +54,9 @@ class SnippetMembersController(
         @Valid @RequestBody body: ChangeRoleRequest,
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<Any> =
-        when (manageMembers.changeRole(jwt.subject!!, targetUserId, snippetId, body.roleId)) {
+        when (manageMembers.changeRole(jwt.subject!!, targetUserId, snippetId, body.role)) {
             ChangeRoleResult.Success ->
-                ResponseEntity.ok(MemberResponse(snippetId, targetUserId, body.roleId))
+                ResponseEntity.ok(MemberResponse(snippetId, targetUserId, body.role.trim().uppercase()))
 
             ChangeRoleResult.NotAllowed -> error(HttpStatus.FORBIDDEN, "not_allowed")
 

@@ -59,7 +59,7 @@ class ManageSnippetMembersService(
         requesterId: String,
         targetUserId: String,
         snippetId: String,
-        roleId: String,
+        role: String,
     ): ChangeRoleResult {
         if (!checkPermission(requesterId, snippetId, Permissions.SHARE)) {
             return ChangeRoleResult.NotAllowed
@@ -68,7 +68,7 @@ class ManageSnippetMembersService(
 
         if (requesterId == targetUserId) return ChangeRoleResult.CannotModifySelf
 
-        return when (updateUserRole(targetUserId, snippetId, roleId)) {
+        return when (updateUserRole(targetUserId, snippetId, role)) {
             UpdateUserRoleResult.Success -> ChangeRoleResult.Success
             UpdateUserRoleResult.MemberNotFound -> ChangeRoleResult.MemberNotFound
             UpdateUserRoleResult.RoleNotFound -> ChangeRoleResult.RoleNotFound
@@ -81,14 +81,14 @@ class ManageSnippetMembersService(
         requesterId: String,
         targetUserId: String,
         snippetId: String,
-        roleId: String,
+        role: String,
     ): ShareResult {
         if (!checkPermission(requesterId, snippetId, Permissions.SHARE)) {
             return ShareResult.NotAllowed
         }
         // Después con auth0, hacer la autenticación de usuarios aca.
 
-        return when (addMember(targetUserId, snippetId, roleId)) {
+        return when (addMember(targetUserId, snippetId, role)) {
             CreateUserPermissionResult.Success -> ShareResult.Success
             CreateUserPermissionResult.AlreadyMember -> ShareResult.AlreadyMember
             CreateUserPermissionResult.RoleNotFound -> ShareResult.RoleNotFound

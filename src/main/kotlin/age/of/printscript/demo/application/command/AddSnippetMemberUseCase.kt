@@ -24,13 +24,15 @@ class AddSnippetMemberUseCase(
     operator fun invoke(
         targetUserId: String,
         snippetId: String,
-        roleId: String,
+        roleName: String,
     ): CreateUserPermissionResult {
-        val role = roles.findById(roleId) ?: return CreateUserPermissionResult.RoleNotFound
+        val normalized = roleName.trim().uppercase()
         // OWNER solo se asigna al crear el snippet (RegisterSnippetOwnerUseCase), nunca al compartir.
-        if (role.name.equals(RoleNames.OWNER, ignoreCase = true)) return CreateUserPermissionResult.OwnerRoleNotAssignable
+        if (normalized == RoleNames.OWNER) return CreateUserPermissionResult.OwnerRoleNotAssignable
 
-        return when (members.add(targetUserId, snippetId, roleId)) {
+        val role = roles.findByName(normalized) ?: return CreateUserPermissionResult.RoleNotFound
+
+        return when (members.add(targetUserId, snippetId, role.id)) {
             AddMemberOutcome.Added -> CreateUserPermissionResult.Success
             AddMemberOutcome.AlreadyMember -> CreateUserPermissionResult.AlreadyMember
         }

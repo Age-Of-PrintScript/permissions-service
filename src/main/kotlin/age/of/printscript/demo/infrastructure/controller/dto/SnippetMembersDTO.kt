@@ -4,17 +4,17 @@ import jakarta.validation.constraints.NotBlank
 
 data class ShareSnippetRequest(
     @field:NotBlank val userId: String,
-    @field:NotBlank val roleId: String,
+    @field:NotBlank val role: String,
 )
 
 data class ChangeRoleRequest(
-    @field:NotBlank val roleId: String,
+    @field:NotBlank val role: String,
 )
 
 data class MemberResponse(
     val snippetId: String,
     val userId: String,
-    val roleId: String,
+    val role: String,
 )
 
 data class ErrorResponse(
