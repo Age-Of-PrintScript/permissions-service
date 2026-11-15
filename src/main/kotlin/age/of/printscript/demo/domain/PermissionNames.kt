@@ -7,3 +7,7 @@ object Permissions {
     const val WRITE = "snippet:write"
     const val SHARE = "snippet:share"
 }
+
+object RoleNames {
+    const val OWNER = "OWNER"
+}

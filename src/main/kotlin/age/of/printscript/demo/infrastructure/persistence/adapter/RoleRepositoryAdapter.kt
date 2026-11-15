@@ -13,4 +13,6 @@ class RoleRepositoryAdapter(
     override fun findById(id: String): SnippetRole? = jpa.findById(id).orElse(null)?.toDomain()
 
     override fun existsById(roleId: String): Boolean = jpa.existsById(roleId)
+
+    override fun findByName(name: String): SnippetRole? = jpa.findByName(name)?.toDomain()
 }
