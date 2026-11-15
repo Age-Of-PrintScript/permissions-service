@@ -21,6 +21,8 @@ sealed interface ChangeRoleResult {
     data object MemberNotFound : ChangeRoleResult
 
     data object RoleNotFound : ChangeRoleResult
+
+    data object OwnerRoleNotAssignable : ChangeRoleResult
 }
 
 sealed interface ShareResult {
@@ -31,6 +33,8 @@ sealed interface ShareResult {
     data object AlreadyMember : ShareResult
 
     data object RoleNotFound : ShareResult
+
+    data object OwnerRoleNotAssignable : ShareResult
 }
 
 sealed interface RevokeResult {
@@ -68,6 +72,7 @@ class ManageSnippetMembersService(
             UpdateUserRoleResult.Success -> ChangeRoleResult.Success
             UpdateUserRoleResult.MemberNotFound -> ChangeRoleResult.MemberNotFound
             UpdateUserRoleResult.RoleNotFound -> ChangeRoleResult.RoleNotFound
+            UpdateUserRoleResult.OwnerRoleNotAssignable -> ChangeRoleResult.OwnerRoleNotAssignable
         }
     }
 
@@ -87,6 +92,7 @@ class ManageSnippetMembersService(
             CreateUserPermissionResult.Success -> ShareResult.Success
             CreateUserPermissionResult.AlreadyMember -> ShareResult.AlreadyMember
             CreateUserPermissionResult.RoleNotFound -> ShareResult.RoleNotFound
+            CreateUserPermissionResult.OwnerRoleNotAssignable -> ShareResult.OwnerRoleNotAssignable
         }
     }
 

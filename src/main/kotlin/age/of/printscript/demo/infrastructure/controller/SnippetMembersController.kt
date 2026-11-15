@@ -43,6 +43,8 @@ class SnippetMembersController(
             ShareResult.AlreadyMember -> error(HttpStatus.CONFLICT, "already_member")
 
             ShareResult.RoleNotFound -> error(HttpStatus.UNPROCESSABLE_ENTITY, "role_not_found")
+
+            ShareResult.OwnerRoleNotAssignable -> error(HttpStatus.UNPROCESSABLE_ENTITY, "cannot_assign_owner")
         }
 
     @PutMapping("/{targetUserId}")
@@ -63,6 +65,8 @@ class SnippetMembersController(
             ChangeRoleResult.MemberNotFound -> error(HttpStatus.NOT_FOUND, "member_not_found")
 
             ChangeRoleResult.RoleNotFound -> error(HttpStatus.UNPROCESSABLE_ENTITY, "role_not_found")
+
+            ChangeRoleResult.OwnerRoleNotAssignable -> error(HttpStatus.UNPROCESSABLE_ENTITY, "cannot_assign_owner")
         }
 
     @DeleteMapping("/{targetUserId}")
