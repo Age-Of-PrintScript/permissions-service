@@ -57,7 +57,7 @@ class SnippetMembersControllerTest {
         val response = controller.share("snip1", ShareSnippetRequest("user2", "editor"), jwt("owner1"))
 
         assertEquals(HttpStatus.CREATED, response.statusCode)
-        assertEquals(MemberResponse("snip1", "user2", "editor"), response.body)
+        assertEquals(MemberResponse("snip1", "user2", "EDITOR"), response.body)
     }
 
     @Test
@@ -99,7 +99,7 @@ class SnippetMembersControllerTest {
         val response = controller.changeRole("snip1", "user2", ChangeRoleRequest("viewer"), jwt("owner1"))
 
         assertEquals(HttpStatus.OK, response.statusCode)
-        assertEquals(MemberResponse("snip1", "user2", "viewer"), response.body)
+        assertEquals(MemberResponse("snip1", "user2", "VIEWER"), response.body)
     }
 
     @Test

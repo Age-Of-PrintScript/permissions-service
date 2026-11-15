@@ -46,6 +46,12 @@ class ManageSnippetMembersServiceTest {
     }
 
     @Test
+    fun `share - normaliza el nombre del rol sin importar mayusculas o espacios`() {
+        assertEquals(ShareResult.Success, service.share(ALICE, DAVE, SNIPPET, "  EDITOR "))
+        assertTrue(members.hasPermission(DAVE, SNIPPET, Permissions.WRITE))
+    }
+
+    @Test
     fun `share - un editor no puede compartir`() {
         assertEquals(ShareResult.NotAllowed, service.share(BOB, DAVE, SNIPPET, VIEWER))
         assertFalse(members.hasPermission(DAVE, SNIPPET, Permissions.READ))

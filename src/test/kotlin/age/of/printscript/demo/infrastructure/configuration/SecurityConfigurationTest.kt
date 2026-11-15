@@ -79,7 +79,7 @@ class SecurityConfigurationTest {
             .perform(
                 post("/snippets/s1/members")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content("""{"userId":"u2","roleId":"viewer"}"""),
+                    .content("""{"userId":"u2","role":"viewer"}"""),
             ).andExpect(status().isUnauthorized)
 
         verifyNoInteractions(manageMembers)
@@ -95,7 +95,7 @@ class SecurityConfigurationTest {
                     .with(jwt().jwt { it.subject("auth0|owner") })
                     .header("X-User-Id", "someone-else")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content("""{"userId":"u2","roleId":"viewer"}"""),
+                    .content("""{"userId":"u2","role":"viewer"}"""),
             ).andExpect(status().isCreated)
 
         verify(manageMembers).share("auth0|owner", "u2", "s1", "viewer")

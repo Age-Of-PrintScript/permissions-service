@@ -24,12 +24,14 @@ class UpdateUserRoleUseCase(
     operator fun invoke(
         targetUserId: String,
         snippetId: String,
-        roleId: String,
+        roleName: String,
     ): UpdateUserRoleResult {
-        val role = roles.findById(roleId) ?: return UpdateUserRoleResult.RoleNotFound
-        if (role.name.equals(RoleNames.OWNER, ignoreCase = true)) return UpdateUserRoleResult.OwnerRoleNotAssignable
+        val normalized = roleName.trim().uppercase()
+        if (normalized == RoleNames.OWNER) return UpdateUserRoleResult.OwnerRoleNotAssignable
 
-        val updated = members.updateRole(targetUserId, snippetId, roleId)
+        val role = roles.findByName(normalized) ?: return UpdateUserRoleResult.RoleNotFound
+
+        val updated = members.updateRole(targetUserId, snippetId, role.id)
         return when (updated) {
             is UpdateMemberRoleOutcome.MemberNotFound -> UpdateUserRoleResult.MemberNotFound
             is UpdateMemberRoleOutcome.Updated -> UpdateUserRoleResult.Success
