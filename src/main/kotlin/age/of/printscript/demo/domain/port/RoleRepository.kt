@@ -6,4 +6,6 @@ interface RoleRepository {
     fun findById(id: String): SnippetRole?
 
     fun existsById(roleId: String): Boolean
+
+    fun findByName(name: String): SnippetRole?
 }

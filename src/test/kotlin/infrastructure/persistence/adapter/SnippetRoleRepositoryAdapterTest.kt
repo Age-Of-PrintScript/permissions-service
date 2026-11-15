@@ -32,6 +32,20 @@ class SnippetRoleRepositoryAdapterTest {
     }
 
     @Test
+    fun `findByName maps the entity to domain`() {
+        `when`(jpa.findByName("OWNER")).thenReturn(RoleEntity(id = "1", name = "OWNER"))
+
+        assertEquals(SnippetRole("1", "OWNER"), adapter.findByName("OWNER"))
+    }
+
+    @Test
+    fun `findByName returns null when the role does not exist`() {
+        `when`(jpa.findByName("NOPE")).thenReturn(null)
+
+        assertNull(adapter.findByName("NOPE"))
+    }
+
+    @Test
     fun `existsById returns true when role exists`() {
         `when`(jpa.existsById("1")).thenReturn(true)
 

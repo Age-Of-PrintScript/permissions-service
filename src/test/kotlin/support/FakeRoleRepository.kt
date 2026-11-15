@@ -9,4 +9,6 @@ class FakeRoleRepository(
     override fun findById(id: String): SnippetRole? = if (id in roleIds) SnippetRole(id = id, name = id) else null
 
     override fun existsById(roleId: String): Boolean = roleId in roleIds
+
+    override fun findByName(name: String): SnippetRole? = findById(name)
 }
