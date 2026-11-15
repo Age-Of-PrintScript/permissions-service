@@ -28,6 +28,26 @@ class SnippetMembersControllerTest {
             .subject(subject)
             .build()
 
+    @Test
+    fun `share returns 422 when trying to assign the owner role`() {
+        `when`(service.share("owner1", "user2", "snip1", "owner-role")).thenReturn(ShareResult.OwnerRoleNotAssignable)
+
+        val response = controller.share("snip1", ShareSnippetRequest("user2", "owner-role"), jwt("owner1"))
+
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.statusCode)
+        assertEquals(ErrorResponse("cannot_assign_owner"), response.body)
+    }
+
+    @Test
+    fun `changeRole returns 422 when trying to assign the owner role`() {
+        `when`(service.changeRole("owner1", "user2", "snip1", "owner-role")).thenReturn(ChangeRoleResult.OwnerRoleNotAssignable)
+
+        val response = controller.changeRole("snip1", "user2", ChangeRoleRequest("owner-role"), jwt("owner1"))
+
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY, response.statusCode)
+        assertEquals(ErrorResponse("cannot_assign_owner"), response.body)
+    }
+
     // --- share ---
 
     @Test

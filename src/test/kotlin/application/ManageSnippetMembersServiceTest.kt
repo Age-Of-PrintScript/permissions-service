@@ -66,6 +66,17 @@ class ManageSnippetMembersServiceTest {
         assertEquals(ShareResult.RoleNotFound, service.share(ALICE, DAVE, SNIPPET, "inexistente"))
     }
 
+    @Test
+    fun `share - no se puede compartir con el rol OWNER`() {
+        assertEquals(ShareResult.OwnerRoleNotAssignable, service.share(ALICE, DAVE, SNIPPET, OWNER))
+        assertFalse(members.hasPermission(DAVE, SNIPPET, Permissions.READ))
+    }
+
+    @Test
+    fun `share - un editor que intenta asignar OWNER recibe NotAllowed`() {
+        assertEquals(ShareResult.NotAllowed, service.share(BOB, DAVE, SNIPPET, OWNER))
+    }
+
     // ---------- changeRole ----------
 
     @Test
@@ -94,6 +105,12 @@ class ManageSnippetMembersServiceTest {
     @Test
     fun `changeRole - RoleNotFound si el rol no existe`() {
         assertEquals(ChangeRoleResult.RoleNotFound, service.changeRole(ALICE, BOB, SNIPPET, "inexistente"))
+    }
+
+    @Test
+    fun `changeRole - no se puede promover a OWNER`() {
+        assertEquals(ChangeRoleResult.OwnerRoleNotAssignable, service.changeRole(ALICE, BOB, SNIPPET, OWNER))
+        assertFalse(members.hasPermission(BOB, SNIPPET, Permissions.SHARE))
     }
 
     // ---------- revoke ----------
