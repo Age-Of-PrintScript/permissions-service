@@ -3,8 +3,10 @@ package age.of.printscript.demo.infrastructure.configuration
 import age.of.printscript.demo.application.ManageSnippetMembersService
 import age.of.printscript.demo.application.ShareResult
 import age.of.printscript.demo.application.query.GetUserPermissionsUseCase
+import age.of.printscript.demo.application.query.GetUserSnippetsUseCase
 import age.of.printscript.demo.infrastructure.controller.PermissionController
 import age.of.printscript.demo.infrastructure.controller.SnippetMembersController
+import age.of.printscript.demo.infrastructure.controller.UserSnippetsController
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
 import org.mockito.Mockito.`when`
@@ -23,7 +25,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import kotlin.test.Test
 
 @WebMvcTest(
-    controllers = [PermissionController::class, SnippetMembersController::class],
+    controllers = [PermissionController::class, SnippetMembersController::class, UserSnippetsController::class],
     properties = [
         "AUTH0_DOMAIN=test.auth0.local",
         "AUTH0_AUDIENCE=https://test-audience",
@@ -43,6 +45,26 @@ class SecurityConfigurationTest {
 
     @MockitoBean
     private lateinit var manageMembers: ManageSnippetMembersService
+
+    @MockitoBean
+    private lateinit var getUserSnippets: GetUserSnippetsUseCase
+
+    @Test
+    fun `GET snippets without token returns 401`() {
+        mockMvc.perform(get("/snippets")).andExpect(status().isUnauthorized)
+        verifyNoInteractions(getUserSnippets)
+    }
+
+    @Test
+    fun `GET snippets uses the jwt subject`() {
+        `when`(getUserSnippets("auth0|ana")).thenReturn(emptyList())
+
+        mockMvc
+            .perform(get("/snippets").with(jwt().jwt { it.subject("auth0|ana") }))
+            .andExpect(status().isOk)
+
+        verify(getUserSnippets)("auth0|ana")
+    }
 
     @Test
     fun `GET permissions without token returns 401`() {
