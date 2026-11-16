@@ -30,6 +30,8 @@ services:
             SPRING_DATASOURCE_PASSWORD: postgres #creo que tengo que cambiar esto
             NEW_RELIC_APP_NAME: "permission-service"
             NEW_RELIC_AGENT_ENABLED: "false"
+            AUTH0_DOMAIN: ${AUTH0_DOMAIN:-dev-ivkfg3acdd7t54se.us.auth0.com}
+            AUTH0_AUDIENCE: ${AUTH0_AUDIENCE:-https://snippet-api-dev}
         depends_on:
             postgres:
                 condition: service_healthy

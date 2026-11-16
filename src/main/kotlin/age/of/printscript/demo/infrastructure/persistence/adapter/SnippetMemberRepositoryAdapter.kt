@@ -22,6 +22,11 @@ class SnippetMemberRepositoryAdapter(
 
     override fun findBySnippetId(snippetId: String): List<SnippetMember> = jpa.findBySnippetId(snippetId).map { it.toDomain() }
 
+    override fun findByUserIdAndPermission(
+        userId: String,
+        permission: String,
+    ): List<SnippetMember> = jpa.findByUserIdAndPermission(userId, permission).map { it.toDomain() }
+
     @Transactional
     override fun updateRole(
         userId: String,
