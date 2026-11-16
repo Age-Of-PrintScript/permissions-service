@@ -26,6 +26,11 @@ interface SnippetMemberRepository {
 
     fun findBySnippetId(snippetId: String): List<SnippetMember>
 
+    fun findByUserIdAndPermission(
+        userId: String,
+        permission: String,
+    ): List<SnippetMember>
+
     fun updateRole(
         userId: String,
         snippetId: String,

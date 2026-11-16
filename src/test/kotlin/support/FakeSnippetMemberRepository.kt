@@ -11,6 +11,7 @@ import age.of.printscript.demo.domain.port.UpdateMemberRoleOutcome
 class FakeSnippetMemberRepository : SnippetMemberRepository {
     private val members = mutableListOf<SnippetMember>()
     private val rolePermissions = mutableMapOf<String, List<Permission>>()
+    private val roleNames = mutableMapOf<String, String>()
     private var nextId = 0
 
     fun givenRolePermissions(
@@ -18,11 +19,21 @@ class FakeSnippetMemberRepository : SnippetMemberRepository {
         permissions: List<Permission>,
     ) {
         rolePermissions[snippetRole.id] = permissions
+        roleNames[snippetRole.id] = snippetRole.name
     }
 
     override fun findById(id: String) = members.firstOrNull { it.id == id }
 
     override fun findBySnippetId(snippetId: String) = members.filter { it.snippetId == snippetId }
+
+    override fun findByUserIdAndPermission(
+        userId: String,
+        permission: String,
+    ): List<SnippetMember> =
+        members.filter { member ->
+            member.userId == userId &&
+                rolePermissions[member.snippetRole.id].orEmpty().any { it.name == permission }
+        }
 
     override fun updateRole(
         userId: String,
@@ -65,7 +76,7 @@ class FakeSnippetMemberRepository : SnippetMemberRepository {
                 id = "member-${nextId++}",
                 snippetId = snippetId,
                 userId = userId,
-                snippetRole = SnippetRole(id = roleId, name = "test"),
+                snippetRole = SnippetRole(id = roleId, name = roleNames[roleId] ?: roleId),
             )
         return AddMemberOutcome.Added
     }
