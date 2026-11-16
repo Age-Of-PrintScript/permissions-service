@@ -23,12 +23,11 @@ class Auth0ManagementTokenProvider(
 ) {
     @Autowired
     constructor(
-        restClientBuilder: RestClient.Builder,
         @Value("\${auth0.domain}") domain: String,
         @Value("\${auth0.management.client-id:}") clientId: String,
         @Value("\${auth0.management.client-secret:}") clientSecret: String,
     ) : this(
-        restClient = restClientBuilder.baseUrl("https://$domain").build(),
+        restClient = RestClient.builder().baseUrl("https://$domain").build(),
         domain = domain,
         clientId = clientId,
         clientSecret = clientSecret,

@@ -32,6 +32,8 @@ services:
             NEW_RELIC_AGENT_ENABLED: "false"
             AUTH0_DOMAIN: ${AUTH0_DOMAIN:-dev-ivkfg3acdd7t54se.us.auth0.com}
             AUTH0_AUDIENCE: ${AUTH0_AUDIENCE:-https://snippet-api-dev}
+            AUTH0_MGMT_CLIENT_ID: ${AUTH0_MGMT_CLIENT_ID:-}
+            AUTH0_MGMT_CLIENT_SECRET: ${AUTH0_MGMT_CLIENT_SECRET:-}
         depends_on:
             postgres:
                 condition: service_healthy

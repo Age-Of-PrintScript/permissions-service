@@ -18,11 +18,10 @@ class Auth0UserDirectory(
 ) : UserDirectory {
     @Autowired
     constructor(
-        restClientBuilder: RestClient.Builder,
         @Value("\${auth0.domain}") domain: String,
         tokenProvider: Auth0ManagementTokenProvider,
     ) : this(
-        restClient = restClientBuilder.baseUrl("https://$domain").build(),
+        restClient = RestClient.builder().baseUrl("https://$domain").build(),
         tokenProvider = tokenProvider,
     )
 
