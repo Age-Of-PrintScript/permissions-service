@@ -9,6 +9,7 @@ import age.of.printscript.demo.infrastructure.controller.dto.ErrorResponse
 import age.of.printscript.demo.infrastructure.controller.dto.MemberResponse
 import age.of.printscript.demo.infrastructure.controller.dto.ShareSnippetRequest
 import jakarta.validation.Valid
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -26,6 +27,8 @@ import org.springframework.web.bind.annotation.RestController
 class SnippetMembersController(
     private val manageMembers: ManageSnippetMembersService,
 ) {
+    private val log = LoggerFactory.getLogger(SnippetMembersController::class.java)
+
     @PostMapping
     fun share(
         @PathVariable snippetId: String,
@@ -33,18 +36,36 @@ class SnippetMembersController(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<Any> =
         when (manageMembers.share(jwt.subject!!, body.userId, snippetId, body.role)) {
-            ShareResult.Success ->
+            ShareResult.Success -> {
+                log.info("Shared snippet {} with user {} with role {}", snippetId, body.userId, body.role)
                 ResponseEntity
                     .status(HttpStatus.CREATED)
                     .body(MemberResponse(snippetId, body.userId, body.role.trim().uppercase()))
+            }
 
-            ShareResult.NotAllowed -> error(HttpStatus.FORBIDDEN, "not_allowed")
+            ShareResult.NotAllowed -> {
+                log.warn("Denied sharing snippet {} with user {}: requester is not allowed", snippetId, body.userId)
+                error(HttpStatus.FORBIDDEN, "not_allowed")
+            }
 
-            ShareResult.AlreadyMember -> error(HttpStatus.CONFLICT, "already_member")
+            ShareResult.AlreadyMember -> {
+                log.warn("Cannot share snippet {} with user {}: already a member", snippetId, body.userId)
+                error(HttpStatus.CONFLICT, "already_member")
+            }
 
-            ShareResult.RoleNotFound -> error(HttpStatus.UNPROCESSABLE_ENTITY, "role_not_found")
+            ShareResult.RoleNotFound -> {
+                log.warn("Cannot share snippet {} with user {}: role {} not found", snippetId, body.userId, body.role)
+                error(HttpStatus.UNPROCESSABLE_ENTITY, "role_not_found")
+            }
 
-            ShareResult.OwnerRoleNotAssignable -> error(HttpStatus.UNPROCESSABLE_ENTITY, "cannot_assign_owner")
+            ShareResult.OwnerRoleNotAssignable -> {
+                log.warn(
+                    "Cannot share snippet {} with user {}: OWNER role cannot be assigned via share",
+                    snippetId,
+                    body.userId,
+                )
+                error(HttpStatus.UNPROCESSABLE_ENTITY, "cannot_assign_owner")
+            }
         }
 
     @PutMapping("/{targetUserId}")
@@ -55,18 +76,52 @@ class SnippetMembersController(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<Any> =
         when (manageMembers.changeRole(jwt.subject!!, targetUserId, snippetId, body.role)) {
-            ChangeRoleResult.Success ->
+            ChangeRoleResult.Success -> {
+                log.info("Changed role of user {} on snippet {} to {}", targetUserId, snippetId, body.role)
                 ResponseEntity.ok(MemberResponse(snippetId, targetUserId, body.role.trim().uppercase()))
+            }
 
-            ChangeRoleResult.NotAllowed -> error(HttpStatus.FORBIDDEN, "not_allowed")
+            ChangeRoleResult.NotAllowed -> {
+                log.warn(
+                    "Denied role change for user {} on snippet {}: requester is not allowed",
+                    targetUserId,
+                    snippetId,
+                )
+                error(HttpStatus.FORBIDDEN, "not_allowed")
+            }
 
-            ChangeRoleResult.CannotModifySelf -> error(HttpStatus.CONFLICT, "cannot_modify_self")
+            ChangeRoleResult.CannotModifySelf -> {
+                log.warn(
+                    "Cannot change role for user {} on snippet {}: users cannot modify their own role",
+                    targetUserId,
+                    snippetId,
+                )
+                error(HttpStatus.CONFLICT, "cannot_modify_self")
+            }
 
-            ChangeRoleResult.MemberNotFound -> error(HttpStatus.NOT_FOUND, "member_not_found")
+            ChangeRoleResult.MemberNotFound -> {
+                log.warn("Cannot change role on snippet {}: user {} is not a member", snippetId, targetUserId)
+                error(HttpStatus.NOT_FOUND, "member_not_found")
+            }
 
-            ChangeRoleResult.RoleNotFound -> error(HttpStatus.UNPROCESSABLE_ENTITY, "role_not_found")
+            ChangeRoleResult.RoleNotFound -> {
+                log.warn(
+                    "Cannot change role for user {} on snippet {}: role {} not found",
+                    targetUserId,
+                    snippetId,
+                    body.role,
+                )
+                error(HttpStatus.UNPROCESSABLE_ENTITY, "role_not_found")
+            }
 
-            ChangeRoleResult.OwnerRoleNotAssignable -> error(HttpStatus.UNPROCESSABLE_ENTITY, "cannot_assign_owner")
+            ChangeRoleResult.OwnerRoleNotAssignable -> {
+                log.warn(
+                    "Cannot change role for user {} on snippet {}: cannot assign OWNER role",
+                    targetUserId,
+                    snippetId,
+                )
+                error(HttpStatus.UNPROCESSABLE_ENTITY, "cannot_assign_owner")
+            }
         }
 
     @DeleteMapping("/{targetUserId}")
@@ -76,13 +131,32 @@ class SnippetMembersController(
         @AuthenticationPrincipal jwt: Jwt,
     ): ResponseEntity<Any> =
         when (manageMembers.revoke(jwt.subject!!, targetUserId, snippetId)) {
-            RevokeResult.Success -> ResponseEntity.noContent().build()
+            RevokeResult.Success -> {
+                log.info("Revoked membership for user {} on snippet {}", targetUserId, snippetId)
+                ResponseEntity.noContent().build()
+            }
 
-            RevokeResult.NotAllowed -> error(HttpStatus.FORBIDDEN, "not_allowed")
+            RevokeResult.NotAllowed -> {
+                log.warn(
+                    "Denied membership revocation for user {} on snippet {}: requester is not allowed",
+                    targetUserId,
+                    snippetId,
+                )
+                error(HttpStatus.FORBIDDEN, "not_allowed")
+            }
 
-            RevokeResult.CannotModifySelf -> error(HttpStatus.CONFLICT, "cannot_modify_self")
+            RevokeResult.CannotModifySelf -> {
+                log.warn(
+                    "Cannot revoke membership on snippet {}: users cannot revoke their own membership",
+                    snippetId,
+                )
+                error(HttpStatus.CONFLICT, "cannot_modify_self")
+            }
 
-            RevokeResult.MemberNotFound -> error(HttpStatus.NOT_FOUND, "member_not_found")
+            RevokeResult.MemberNotFound -> {
+                log.warn("Cannot revoke membership on snippet {}: user {} is not a member", snippetId, targetUserId)
+                error(HttpStatus.NOT_FOUND, "member_not_found")
+            }
         }
 
     private fun error(
