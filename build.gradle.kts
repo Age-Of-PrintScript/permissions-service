@@ -21,7 +21,17 @@ java {
 }
 
 
+val newRelicVersion = "9.5.0"
+
+val newrelic = configurations.create("newrelic") {
+	isCanBeConsumed = false
+	isCanBeResolved = true
+	isTransitive = false
+}
+
 dependencies {
+	newrelic("com.newrelic.agent.java:newrelic-agent:$newRelicVersion")
+
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-webmvc")
 	implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
@@ -63,4 +73,14 @@ allOpen {
 
 
 
+}
+
+tasks.register<Sync>("copyNewRelic") {
+	from(newrelic) {
+		rename { "newrelic.jar" }
+	}
+	from("newrelic") {
+		include("newrelic.yml")
+	}
+	into(layout.buildDirectory.dir("newrelic"))
 }

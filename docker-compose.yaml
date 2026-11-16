@@ -28,6 +28,8 @@ services:
             SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/permission_db
             SPRING_DATASOURCE_USERNAME: postgres
             SPRING_DATASOURCE_PASSWORD: postgres #creo que tengo que cambiar esto
+            NEW_RELIC_APP_NAME: "permission-service"
+            NEW_RELIC_AGENT_ENABLED: "false"
         depends_on:
             postgres:
                 condition: service_healthy
