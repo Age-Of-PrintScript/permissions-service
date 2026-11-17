@@ -1,5 +1,6 @@
 package age.of.printscript.demo.application.command
 
+import age.of.printscript.demo.domain.RoleNames
 import age.of.printscript.demo.domain.port.AddMemberOutcome
 import age.of.printscript.demo.domain.port.RoleRepository
 import age.of.printscript.demo.domain.port.SnippetMemberRepository
@@ -11,6 +12,8 @@ sealed interface CreateUserPermissionResult {
     data object AlreadyMember : CreateUserPermissionResult
 
     data object RoleNotFound : CreateUserPermissionResult
+
+    data object OwnerRoleNotAssignable : CreateUserPermissionResult
 }
 
 @Service
@@ -21,11 +24,15 @@ class AddSnippetMemberUseCase(
     operator fun invoke(
         targetUserId: String,
         snippetId: String,
-        roleId: String,
+        roleName: String,
     ): CreateUserPermissionResult {
-        if (!roles.existsById(roleId)) return CreateUserPermissionResult.RoleNotFound
+        val normalized = roleName.trim().uppercase()
+        // OWNER solo se asigna al crear el snippet (RegisterSnippetOwnerUseCase), nunca al compartir.
+        if (normalized == RoleNames.OWNER) return CreateUserPermissionResult.OwnerRoleNotAssignable
 
-        return when (members.add(targetUserId, snippetId, roleId)) {
+        val role = roles.findByName(normalized) ?: return CreateUserPermissionResult.RoleNotFound
+
+        return when (members.add(targetUserId, snippetId, role.id)) {
             AddMemberOutcome.Added -> CreateUserPermissionResult.Success
             AddMemberOutcome.AlreadyMember -> CreateUserPermissionResult.AlreadyMember
         }

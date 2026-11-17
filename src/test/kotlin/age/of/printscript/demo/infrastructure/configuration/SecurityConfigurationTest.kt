@@ -3,8 +3,13 @@ package age.of.printscript.demo.infrastructure.configuration
 import age.of.printscript.demo.application.ManageSnippetMembersService
 import age.of.printscript.demo.application.ShareResult
 import age.of.printscript.demo.application.query.GetUserPermissionsUseCase
+import age.of.printscript.demo.application.query.GetUserSnippetsUseCase
+import age.of.printscript.demo.application.query.SearchUsersUseCase
+import age.of.printscript.demo.domain.UserPage
 import age.of.printscript.demo.infrastructure.controller.PermissionController
 import age.of.printscript.demo.infrastructure.controller.SnippetMembersController
+import age.of.printscript.demo.infrastructure.controller.UserSnippetsController
+import age.of.printscript.demo.infrastructure.controller.UsersController
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
 import org.mockito.Mockito.`when`
@@ -23,7 +28,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import kotlin.test.Test
 
 @WebMvcTest(
-    controllers = [PermissionController::class, SnippetMembersController::class],
+    controllers = [PermissionController::class, SnippetMembersController::class, UserSnippetsController::class, UsersController::class],
     properties = [
         "AUTH0_DOMAIN=test.auth0.local",
         "AUTH0_AUDIENCE=https://test-audience",
@@ -43,6 +48,46 @@ class SecurityConfigurationTest {
 
     @MockitoBean
     private lateinit var manageMembers: ManageSnippetMembersService
+
+    @MockitoBean
+    private lateinit var getUserSnippets: GetUserSnippetsUseCase
+
+    @MockitoBean
+    private lateinit var searchUsers: SearchUsersUseCase
+
+    @Test
+    fun `GET users without token returns 401`() {
+        mockMvc.perform(get("/users")).andExpect(status().isUnauthorized)
+        verifyNoInteractions(searchUsers)
+    }
+
+    @Test
+    fun `GET users passes jwt subject`() {
+        `when`(searchUsers("pepe", 0, 5, "auth0|ana")).thenReturn(UserPage(0, 5, 0, emptyList()))
+
+        mockMvc
+            .perform(get("/users").param("name", "pepe").with(jwt().jwt { it.subject("auth0|ana") }))
+            .andExpect(status().isOk)
+
+        verify(searchUsers)("pepe", 0, 5, "auth0|ana")
+    }
+
+    @Test
+    fun `GET snippets without token returns 401`() {
+        mockMvc.perform(get("/snippets")).andExpect(status().isUnauthorized)
+        verifyNoInteractions(getUserSnippets)
+    }
+
+    @Test
+    fun `GET snippets uses the jwt subject`() {
+        `when`(getUserSnippets("auth0|ana")).thenReturn(emptyList())
+
+        mockMvc
+            .perform(get("/snippets").with(jwt().jwt { it.subject("auth0|ana") }))
+            .andExpect(status().isOk)
+
+        verify(getUserSnippets)("auth0|ana")
+    }
 
     @Test
     fun `GET permissions without token returns 401`() {
@@ -79,7 +124,7 @@ class SecurityConfigurationTest {
             .perform(
                 post("/snippets/s1/members")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content("""{"userId":"u2","roleId":"viewer"}"""),
+                    .content("""{"userId":"u2","role":"viewer"}"""),
             ).andExpect(status().isUnauthorized)
 
         verifyNoInteractions(manageMembers)
@@ -95,7 +140,7 @@ class SecurityConfigurationTest {
                     .with(jwt().jwt { it.subject("auth0|owner") })
                     .header("X-User-Id", "someone-else")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content("""{"userId":"u2","roleId":"viewer"}"""),
+                    .content("""{"userId":"u2","role":"viewer"}"""),
             ).andExpect(status().isCreated)
 
         verify(manageMembers).share("auth0|owner", "u2", "s1", "viewer")

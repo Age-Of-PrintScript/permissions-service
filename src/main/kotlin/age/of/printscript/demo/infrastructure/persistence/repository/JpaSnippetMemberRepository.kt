@@ -11,6 +11,21 @@ import org.springframework.data.repository.query.Param
 interface JpaSnippetMemberRepository : JpaRepository<SnippetMemberEntity, String> {
     fun findBySnippetId(snippetId: String): List<SnippetMemberEntity>
 
+    @Query(
+        """
+        select distinct m
+        from SnippetMemberEntity m
+        join fetch m.role r
+        join r.permissions p
+        where m.userId = :userId
+          and p.name = :permission
+        """,
+    )
+    fun findByUserIdAndPermission(
+        @Param("userId") userId: String,
+        @Param("permission") permission: String,
+    ): List<SnippetMemberEntity>
+
     fun existsByUserIdAndSnippetId(
         userId: String,
         snippetId: String,

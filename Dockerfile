@@ -7,6 +7,7 @@ COPY gradlew .
 COPY gradle gradle
 COPY build.gradle.kts settings.gradle.kts ./
 COPY src src
+COPY newrelic newrelic
 
 RUN chmod +x gradlew
 
@@ -16,7 +17,7 @@ RUN chmod +x gradlew
 
 RUN --mount=type=secret,id=gradle_properties,target=/root/.gradle/gradle.properties \
     --mount=type=cache,target=/root/.gradle/caches \
-    ./gradlew bootJar --no-daemon -x test
+    ./gradlew bootJar copyNewRelic --no-daemon -x test
 
 # ---------- Etapa 2: ejecutar ----------
 FROM eclipse-temurin:21-jre-alpine
@@ -24,7 +25,9 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
 COPY --from=builder /app/build/libs/*.jar app.jar
+COPY --from=builder /app/build/newrelic/newrelic.jar /app/newrelic.jar
+COPY --from=builder /app/build/newrelic/newrelic.yml /app/newrelic.yml
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-javaagent:/app/newrelic.jar", "-jar", "app.jar"]

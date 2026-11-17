@@ -40,6 +40,15 @@ class SnippetMemberRepositoryAdapterTest {
     }
 
     @Test
+    fun `findByUserIdAndPermission maps entities to domain`() {
+        `when`(jpa.findByUserIdAndPermission("ana", "snippet:read")).thenReturn(listOf(memberEntity))
+
+        val result = adapter.findByUserIdAndPermission("ana", "snippet:read")
+
+        assertEquals(listOf(SnippetMember("7", "ana", "10", SnippetRole("1", "OWNER"))), result)
+    }
+
+    @Test
     fun `findBySnippetId maps entities to domain`() {
         `when`(jpa.findBySnippetId("10")).thenReturn(listOf(memberEntity))
         val result = adapter.findBySnippetId("10")

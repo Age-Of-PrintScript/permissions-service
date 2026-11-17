@@ -1,5 +1,6 @@
 package age.of.printscript.demo.application.command
 
+import age.of.printscript.demo.domain.RoleNames
 import age.of.printscript.demo.domain.port.RoleRepository
 import age.of.printscript.demo.domain.port.SnippetMemberRepository
 import age.of.printscript.demo.domain.port.UpdateMemberRoleOutcome
@@ -11,6 +12,8 @@ sealed interface UpdateUserRoleResult {
     data object MemberNotFound : UpdateUserRoleResult
 
     data object RoleNotFound : UpdateUserRoleResult
+
+    data object OwnerRoleNotAssignable : UpdateUserRoleResult
 }
 
 @Service
@@ -21,11 +24,14 @@ class UpdateUserRoleUseCase(
     operator fun invoke(
         targetUserId: String,
         snippetId: String,
-        roleId: String,
+        roleName: String,
     ): UpdateUserRoleResult {
-        if (!roles.existsById(roleId)) return UpdateUserRoleResult.RoleNotFound
+        val normalized = roleName.trim().uppercase()
+        if (normalized == RoleNames.OWNER) return UpdateUserRoleResult.OwnerRoleNotAssignable
 
-        val updated = members.updateRole(targetUserId, snippetId, roleId)
+        val role = roles.findByName(normalized) ?: return UpdateUserRoleResult.RoleNotFound
+
+        val updated = members.updateRole(targetUserId, snippetId, role.id)
         return when (updated) {
             is UpdateMemberRoleOutcome.MemberNotFound -> UpdateUserRoleResult.MemberNotFound
             is UpdateMemberRoleOutcome.Updated -> UpdateUserRoleResult.Success
